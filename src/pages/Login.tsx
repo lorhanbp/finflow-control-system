@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useTexts } from '@/hooks/useTexts';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +18,7 @@ const Login = () => {
   
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
+  const texts = useTexts();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,19 +28,19 @@ const Login = () => {
       if (isSignUp) {
         await signUp(email, password, displayName);
         toast({
-          title: "Conta criada com sucesso!",
-          description: "Você foi autenticado automaticamente.",
+          title: texts.login.successSignUpTitle,
+          description: texts.login.successSignUpDescription,
         });
       } else {
         await signIn(email, password);
         toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo ao sistema financeiro.",
+          title: texts.login.successLoginTitle,
+          description: texts.login.successLoginDescription,
         });
       }
     } catch (error: any) {
       toast({
-        title: "Erro na autenticação",
+        title: texts.login.errorTitle,
         description: error.message,
         variant: "destructive",
       });
@@ -57,21 +59,21 @@ const Login = () => {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            {isSignUp ? 'Criar Conta' : 'Sistema Financeiro'}
+            {isSignUp ? texts.login.createAccountTitle : texts.login.title}
           </CardTitle>
           <p className="text-gray-600">
-            {isSignUp ? 'Crie sua conta para começar' : 'Entre com suas credenciais'}
+            {isSignUp ? texts.login.createAccountSubtitle : texts.login.subtitle}
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div className="space-y-2">
-                <Label htmlFor="displayName">Nome de Usuário</Label>
+                <Label htmlFor="displayName">{texts.login.displayNameLabel}</Label>
                 <Input
                   id="displayName"
                   type="text"
-                  placeholder="Seu nome completo"
+                  placeholder={texts.login.displayNamePlaceholder}
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   required
@@ -80,11 +82,11 @@ const Login = () => {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{texts.login.emailLabel}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
+                placeholder={texts.login.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -92,11 +94,11 @@ const Login = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">{texts.login.passwordLabel}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Sua senha"
+                placeholder={texts.login.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -104,7 +106,7 @@ const Login = () => {
             </div>
             
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Aguarde...' : (isSignUp ? 'Criar Conta' : 'Entrar')}
+              {loading ? texts.login.loadingText : (isSignUp ? texts.login.createAccountButton : texts.login.loginButton)}
             </Button>
           </form>
           
@@ -114,7 +116,7 @@ const Login = () => {
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
-              {isSignUp ? 'Já tem uma conta? Entre aqui' : 'Não tem conta? Crie uma aqui'}
+              {isSignUp ? texts.login.switchToLogin : texts.login.switchToSignUp}
             </button>
           </div>
         </CardContent>

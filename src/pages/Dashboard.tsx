@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useTexts } from '@/hooks/useTexts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,7 @@ interface Transaction {
 const Dashboard = () => {
   const { user, logout, updateUserProfile } = useAuth();
   const { toast } = useToast();
+  const texts = useTexts();
   const [showProfile, setShowProfile] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState(user?.displayName || '');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -47,13 +48,13 @@ const Dashboard = () => {
     try {
       await logout();
       toast({
-        title: "Logout realizado com sucesso!",
-        description: "Até a próxima!",
+        title: texts.dashboard.logoutSuccessTitle,
+        description: texts.dashboard.logoutSuccessDescription,
       });
     } catch (error) {
       toast({
-        title: "Erro ao fazer logout",
-        description: "Tente novamente.",
+        title: texts.dashboard.logoutErrorTitle,
+        description: texts.dashboard.logoutErrorDescription,
         variant: "destructive",
       });
     }
@@ -64,13 +65,13 @@ const Dashboard = () => {
       await updateUserProfile(newDisplayName);
       setShowProfile(false);
       toast({
-        title: "Perfil atualizado!",
-        description: "Nome de usuário alterado com sucesso.",
+        title: texts.dashboard.profileUpdateSuccessTitle,
+        description: texts.dashboard.profileUpdateSuccessDescription,
       });
     } catch (error) {
       toast({
-        title: "Erro ao atualizar perfil",
-        description: "Tente novamente.",
+        title: texts.dashboard.profileUpdateErrorTitle,
+        description: texts.dashboard.profileUpdateErrorDescription,
         variant: "destructive",
       });
     }
@@ -79,8 +80,8 @@ const Dashboard = () => {
   const addTransaction = () => {
     if (!newTransaction.amount || !newTransaction.description || !newTransaction.category) {
       toast({
-        title: "Preencha todos os campos",
-        description: "Todos os campos são obrigatórios.",
+        title: texts.dashboard.transactionErrorTitle,
+        description: texts.dashboard.transactionErrorDescription,
         variant: "destructive",
       });
       return;
@@ -99,8 +100,8 @@ const Dashboard = () => {
     setNewTransaction({ type: 'income', amount: '', description: '', category: '' });
     
     toast({
-      title: "Transação adicionada!",
-      description: "Nova transação registrada com sucesso.",
+      title: texts.dashboard.transactionSuccessTitle,
+      description: texts.dashboard.transactionSuccessDescription,
     });
   };
 
@@ -131,22 +132,22 @@ const Dashboard = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard Financeiro</h1>
-              <p className="text-gray-600">Bem-vindo, {user?.displayName || user?.email}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{texts.dashboard.title}</h1>
+              <p className="text-gray-600">{texts.dashboard.welcomeMessage}, {user?.displayName || user?.email}</p>
             </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowProfile(!showProfile)}
               >
-                Perfil
+                {texts.dashboard.profileButton}
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Sair
+                {texts.dashboard.logoutButton}
               </Button>
             </div>
           </div>
@@ -156,21 +157,21 @@ const Dashboard = () => {
         {showProfile && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Atualizar Perfil</CardTitle>
+              <CardTitle>{texts.dashboard.updateProfileTitle}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex gap-4 items-end">
                 <div className="flex-1">
-                  <Label htmlFor="displayName">Nome de Usuário</Label>
+                  <Label htmlFor="displayName">{texts.dashboard.updateProfileLabel}</Label>
                   <Input
                     id="displayName"
                     value={newDisplayName}
                     onChange={(e) => setNewDisplayName(e.target.value)}
-                    placeholder="Novo nome de usuário"
+                    placeholder={texts.dashboard.updateProfilePlaceholder}
                   />
                 </div>
-                <Button onClick={handleUpdateProfile}>Atualizar</Button>
-                <Button variant="outline" onClick={() => setShowProfile(false)}>Cancelar</Button>
+                <Button onClick={handleUpdateProfile}>{texts.dashboard.updateButton}</Button>
+                <Button variant="outline" onClick={() => setShowProfile(false)}>{texts.dashboard.cancelButton}</Button>
               </div>
             </CardContent>
           </Card>
@@ -180,28 +181,28 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-green-600">Receitas</CardTitle>
+              <CardTitle className="text-green-600">{texts.dashboard.incomeTitle}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">R$ {totalIncome.toLocaleString('pt-BR')}</p>
+              <p className="text-2xl font-bold">{texts.common.currency} {totalIncome.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-red-600">Despesas</CardTitle>
+              <CardTitle className="text-red-600">{texts.dashboard.expensesTitle}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">R$ {totalExpenses.toLocaleString('pt-BR')}</p>
+              <p className="text-2xl font-bold">{texts.common.currency} {totalExpenses.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle className={balance >= 0 ? "text-green-600" : "text-red-600"}>Saldo</CardTitle>
+              <CardTitle className={balance >= 0 ? "text-green-600" : "text-red-600"}>{texts.dashboard.balanceTitle}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">R$ {balance.toLocaleString('pt-BR')}</p>
+              <p className="text-2xl font-bold">{texts.common.currency} {balance.toLocaleString('pt-BR')}</p>
             </CardContent>
           </Card>
         </div>
@@ -209,48 +210,48 @@ const Dashboard = () => {
         {/* Add Transaction */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Adicionar Transação</CardTitle>
+            <CardTitle>{texts.dashboard.addTransactionTitle}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
-                <Label>Tipo</Label>
+                <Label>{texts.dashboard.typeLabel}</Label>
                 <select
                   value={newTransaction.type}
                   onChange={(e) => setNewTransaction({...newTransaction, type: e.target.value as 'income' | 'expense'})}
                   className="w-full p-2 border rounded-md"
                 >
-                  <option value="income">Receita</option>
-                  <option value="expense">Despesa</option>
+                  <option value="income">{texts.dashboard.incomeOption}</option>
+                  <option value="expense">{texts.dashboard.expenseOption}</option>
                 </select>
               </div>
               <div>
-                <Label>Valor</Label>
+                <Label>{texts.dashboard.amountLabel}</Label>
                 <Input
                   type="number"
-                  placeholder="0.00"
+                  placeholder={texts.dashboard.amountPlaceholder}
                   value={newTransaction.amount}
                   onChange={(e) => setNewTransaction({...newTransaction, amount: e.target.value})}
                 />
               </div>
               <div>
-                <Label>Descrição</Label>
+                <Label>{texts.dashboard.descriptionLabel}</Label>
                 <Input
-                  placeholder="Descrição"
+                  placeholder={texts.dashboard.descriptionPlaceholder}
                   value={newTransaction.description}
                   onChange={(e) => setNewTransaction({...newTransaction, description: e.target.value})}
                 />
               </div>
               <div>
-                <Label>Categoria</Label>
+                <Label>{texts.dashboard.categoryLabel}</Label>
                 <Input
-                  placeholder="Categoria"
+                  placeholder={texts.dashboard.categoryPlaceholder}
                   value={newTransaction.category}
                   onChange={(e) => setNewTransaction({...newTransaction, category: e.target.value})}
                 />
               </div>
               <div className="flex items-end">
-                <Button onClick={addTransaction} className="w-full">Adicionar</Button>
+                <Button onClick={addTransaction} className="w-full">{texts.dashboard.addButton}</Button>
               </div>
             </div>
           </CardContent>
@@ -262,7 +263,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ChartLine className="h-5 w-5" />
-                Fluxo de Caixa
+                {texts.dashboard.cashFlowTitle}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -271,7 +272,7 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip formatter={(value) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, '']} />
+                  <Tooltip formatter={(value) => [`${texts.common.currency} ${Number(value).toLocaleString('pt-BR')}`, '']} />
                   <Legend />
                   <Line type="monotone" dataKey="receitas" stroke="#22c55e" strokeWidth={2} />
                   <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={2} />
@@ -284,7 +285,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ChartBar className="h-5 w-5" />
-                Gastos por Categoria
+                {texts.dashboard.categoryExpensesTitle}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -293,7 +294,7 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="category" />
                   <YAxis />
-                  <Tooltip formatter={(value) => [`R$ ${Number(value).toLocaleString('pt-BR')}`, 'Valor']} />
+                  <Tooltip formatter={(value) => [`${texts.common.currency} ${Number(value).toLocaleString('pt-BR')}`, 'Valor']} />
                   <Bar dataKey="value" fill="#3b82f6" />
                 </BarChart>
               </ResponsiveContainer>
@@ -304,18 +305,18 @@ const Dashboard = () => {
         {/* Recent Transactions */}
         <Card>
           <CardHeader>
-            <CardTitle>Transações Recentes</CardTitle>
+            <CardTitle>{texts.dashboard.recentTransactionsTitle}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left p-2">Data</th>
-                    <th className="text-left p-2">Descrição</th>
-                    <th className="text-left p-2">Categoria</th>
-                    <th className="text-left p-2">Tipo</th>
-                    <th className="text-right p-2">Valor</th>
+                    <th className="text-left p-2">{texts.dashboard.dateColumn}</th>
+                    <th className="text-left p-2">{texts.dashboard.descriptionColumn}</th>
+                    <th className="text-left p-2">{texts.dashboard.categoryColumn}</th>
+                    <th className="text-left p-2">{texts.dashboard.typeColumn}</th>
+                    <th className="text-right p-2">{texts.dashboard.amountColumn}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -330,13 +331,13 @@ const Dashboard = () => {
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                          {transaction.type === 'income' ? texts.dashboard.incomeOption : texts.dashboard.expenseOption}
                         </span>
                       </td>
                       <td className={`p-2 text-right font-semibold ${
                         transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        {transaction.type === 'income' ? '+' : '-'}R$ {transaction.amount.toLocaleString('pt-BR')}
+                        {transaction.type === 'income' ? '+' : '-'}{texts.common.currency} {transaction.amount.toLocaleString('pt-BR')}
                       </td>
                     </tr>
                   ))}
